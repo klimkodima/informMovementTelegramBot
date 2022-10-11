@@ -6,7 +6,7 @@ module.exports = async (params) => {
     const options = {
         method: 'GET',
         url: 'https://worldometer-covid-19.p.rapidapi.com/GetCovidStats',
-        params: params,//{countrycode: 'us', date: 'Aug 15, 2021'},
+        params: params,
         headers: {
           'X-RapidAPI-Key': API_COVID_API_KEY,
           'X-RapidAPI-Host': 'worldometer-covid-19.p.rapidapi.com'

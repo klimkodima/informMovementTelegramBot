@@ -4,11 +4,9 @@ const bmiValue = require('./util/bmiValue')
 const getCurrency = require('./util/api/getCurrency')
 const getWeather = require('./util/api/getWeather')
 const getCovidStats = require('./util/api/getCovidStats')
-const covidStatsMessage = require('./util/messages/covidStatsMessage')
-const weatherMessage = require('./util/messages/weatherMessage')
-const coursesMessage = require('./util/messages/coursesMessage')
-const { TELEGRAM_API_TOKEN } = require('./util/config')
 const searchImage = require('./util/api/searchImages')
+const { coursesMessage, weatherMessage, covidStatsMessage } = require('./util/messages')
+const { TELEGRAM_API_TOKEN } = require('./util/config')
 
 const bot = new Telegraf(TELEGRAM_API_TOKEN, { polling: true })
 bot.start(ctx => {
@@ -22,32 +20,15 @@ bot.command('c', async ctx => {
 
 bot.command('w', async ctx => {
     const { data } = await getWeather()
-    return ctx.replyWithMarkdown(
-        `Погода в Минске: 
-             Описание: ${data.weather[0].description}
-             Температура: ${data.main.temp} градусов,
-             Давление: ${data.main.pressure} гПа,
-             Влажность: ${data.main.humidity} %,
-             Облачность: ${data.clouds.all} %,
-             Скорость ветра: ${data.wind.speed} м\\с`
-    )
+    return ctx.replyWithMarkdown(weatherMessage(data))
 })
 
 bot.command('covid', async ctx => {
-    const { data } = await getCovidStats()
-    return ctx.replyWithMarkdown(
-        `Погода в Минске: 
-             Описание: ${data.weather[0].description}
-             Температура: ${data.main.temp} градусов,
-             Давление: ${data.main.pressure} гПа,
-             Влажность: ${data.main.humidity} %,
-             Облачность: ${data.clouds.all} %,
-             Скорость ветра: ${data.wind.speed} м\\с`
-    )
+    const { data } = await getCovidStats({ countrycode: 'us' })
+    return ctx.replyWithMarkdown(covidStatsMessage(data))
 })
 
 bot.on("inline_query", async (ctx) => {
-    if (!ctx.inlineQuery.query) return
     const result = await searchImage(ctx.inlineQuery.query)
     const data = result.data.hits.map((hit) => {
         return {
@@ -75,9 +56,20 @@ bot.on("inline_query", async (ctx) => {
             }
         }
     })
-    return ctx.answerInlineQuery(data)
+    const data1 = [{
+        type: 'photo',
+        id: 1417208,
+        photo_url: 'https://pixabay.com/get/ge8eeb7c2a9ebf2ac861f2fbf99d487f96d03d88ec18172bbd295fe81b3b42a19b48cfd9500606e021fffa629a2b9a33d7ddfad9cb5febc4f416c1c49e2496d7f_1280.png',
+        thumb_url: 'https://cdn.pixabay.com/photo/2016/05/26/13/51/dog-1417208_150.png',
+        title: 'dog',
+        description: 'dog, animal, corgi',
+    }]
+
+    console.log(data1)
+    return ctx.answerInlineQuery( data1)
 })
 
+/*
 const superWizard = new Scenes.WizardScene('create',
     (ctx) => {
         ctx.reply('1. Введите Ваш Вес (кг):')
@@ -108,4 +100,5 @@ const stage = new Scenes.Stage([superWizard], {
 //bot.command('bmi', async ctx => {
     
 //})
+*/
 bot.launch()

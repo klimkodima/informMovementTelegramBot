@@ -9,8 +9,8 @@ module.exports = async (q) => {
                 key: PIXABAY_KEY,
                 q
             },
-        });
+        })
     } catch (e) {
-        console.log(e);
+        console.log(e)
     }
 }
